@@ -2,6 +2,7 @@ package com.RDABank.RDABank.Models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,6 +13,8 @@ import lombok.*;
 @Table(name = "PERSONAL_DETAILS")
 public class PersonalDetails {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     @OneToOne
     @JoinColumn(name = "ACCOUNT_NO")
     private AccountDetails accountNo;
