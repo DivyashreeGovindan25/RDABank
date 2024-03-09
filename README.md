@@ -7,5 +7,4 @@ Banking application based on java spring boot framerwork, It is a backend based 
 - MySQL.
 
 ## Developers
-- Rajkumaran SD - RajkumaranSDR(rajkumaransdr@gmail.com).
-- Anuradha M - Anuradha343(anuradha22mohan@gmail.com).
+- Divyashree Govindan - DivyashreeGovindan25(divyashreegovindan@gmail.com).
