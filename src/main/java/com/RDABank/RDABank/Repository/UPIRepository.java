@@ -18,6 +18,6 @@ public interface UPIRepository extends JpaRepository<UPIDetails,String> {
     public UPIDetails getUPIByAccountNo(@Param("accountNo") AccountDetails accountNo);
     @Modifying
     @Transactional
-    @Query(value = "UPDATE UPIDetails u SET u.upiPin = :upiPin WHERE u.upiId = :upiId")
-    public void updateUPIPin(@Param("upiId") String upiId,@Param("upiPin") Integer upiPin);
+    @Query(value = "UPDATE UPIDetails u SET u.upiPin = :upiPin2 WHERE u.upiId = :upiId")
+    public void updateUPIPin(@Param("upiId") String upiId,@Param("upiPin2") Integer upiPin2);
 }

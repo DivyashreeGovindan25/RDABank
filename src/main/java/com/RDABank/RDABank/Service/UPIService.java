@@ -92,6 +92,6 @@ public class UPIService {
         //Verifying card number
         //.....
         upiRepo.updateUPIPin(forgotUPIPinDTO.getUpiId(),forgotUPIPinDTO.getUpiPin());
-        return String.format("Upi Pin reset is successfull");
+        return String.format("Upi Pin reset is successfully");
     }
 }

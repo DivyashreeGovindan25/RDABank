@@ -65,8 +65,8 @@ public class UPIController {
         catch(InvalidEmailException | InvalidUPIPinException | InvalidAccountNumberException invalidEmailException){
             return new ResponseEntity<>(new GeneralMessageDTO(invalidEmailException.getMessage()),HttpStatus.NOT_ACCEPTABLE);
         }
-        catch(AccountDoesnotExistException accountDoesnotExistException){
-            return new ResponseEntity<>(new GeneralMessageDTO(accountDoesnotExistException.getMessage()),HttpStatus.NOT_FOUND);
+        catch(AccountDoesnotExistException accountDoesnotExistException) {
+            return new ResponseEntity<>(new GeneralMessageDTO(accountDoesnotExistException.getMessage()), HttpStatus.NOT_FOUND);
         }
     }
 }

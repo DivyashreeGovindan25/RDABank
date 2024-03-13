@@ -1,12 +1,12 @@
 package com.RDABank.RDABank.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 public class ForgotUPIPinDTO {
     Long accountNo;
     String upiId;
