@@ -1,5 +1,6 @@
 package com.RDABank.RDABank.Service;
 
+import com.RDABank.RDABank.DTO.ForgotUPIPinDTO;
 import com.RDABank.RDABank.DTO.UPIRegisterDTO;
 import com.RDABank.RDABank.Exception.*;
 import com.RDABank.RDABank.Models.AccountDetails;
@@ -10,7 +11,12 @@ import com.RDABank.RDABank.Repository.PersonalDetailsRepository;
 import com.RDABank.RDABank.Repository.UPIRepository;
 import com.RDABank.RDABank.Utils.UPIUtils.UPIRegiterValidations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.RDABank.RDABank.Utils.RDALogger.upiLogger;
 import static com.RDABank.RDABank.Utils.UPIUtils.UPIIDType.SAMEASBANKEMAIL;
@@ -63,5 +69,29 @@ public class UPIService {
         if(!upiId) throw new RegisteredForUPIOrNotException("Account not registered for UPI");
         upiLogger.info("Passed Upi account exist or not validation");
         return upiDetails.getUpiId();
+    }
+    public String forgotUPIPin(ForgotUPIPinDTO forgotUPIPinDTO) throws InvalidEmailException,AccountDoesnotExistException,
+            InvalidUPIPinException,InvalidAccountNumberException{
+        //Account Number validation
+        UPIRegiterValidations.accountLenValidation(forgotUPIPinDTO.getAccountNo());
+        upiLogger.info("Passed account length validation");
+        //Provided UPI Id exist or not
+        boolean doesExist = UPIRegiterValidations.UPIaccountExistOrNot(upiRepo.getUPIWithTheProvidedUPIId(forgotUPIPinDTO.getUpiId()));
+        if(!doesExist) throw new AccountDoesnotExistException(String.format("The provided UPI Id is invalid"));
+        upiLogger.info("Passed UPI Id registered or not validation");
+        //Upi Pin Validaiton
+        UPIRegiterValidations.UPIPinLenValidation(forgotUPIPinDTO.getUpiPin());
+        UPIRegiterValidations.UPIPinCompareValidation(forgotUPIPinDTO.getUpiPin(),forgotUPIPinDTO.getConfirmUPIPin());
+        upiLogger.info("Passed UPI Pin validation");
+        //Is same UPI Id registered for this account
+        UPIDetails userUpiDetails = upiRepo.getUPIWithTheProvidedUPIId(forgotUPIPinDTO.getUpiId());
+        if(!Objects.equals(forgotUPIPinDTO.getAccountNo(),userUpiDetails.getAccountNo().getAccountNo())){
+            throw new AccountDoesnotExistException(String.format("The provided UPI ID is not registered for the given account number"));
+        }
+        upiLogger.info("Passed UPI Id registered for the given account number validation");
+        //Verifying card number
+        //.....
+        upiRepo.updateUPIPin(forgotUPIPinDTO.getUpiId(),forgotUPIPinDTO.getUpiPin());
+        return String.format("Upi Pin reset is successfull");
     }
 }

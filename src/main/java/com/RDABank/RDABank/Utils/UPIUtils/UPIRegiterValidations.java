@@ -21,56 +21,44 @@ public class UPIRegiterValidations {
     public static void UPIRegisterAccountNumberValidation(UPIRegisterDTO upiRegisterDTO, UPIDetails upiDetails, Object accountDetails)
     throws AccountDoesnotExistException,RegisteredForUPIOrNotException{
         accountLenValidation(upiRegisterDTO.getAccountNo());
-        upiLogger.info("Passed account number length exception");
         if(accountDetails == null){
-            upiLogger.info("Encountered account doesn't exist exception");
             throw new AccountDoesnotExistException(String.format("No account exist with account number %d ",upiRegisterDTO.getAccountNo()));
         }
         if(UPIaccountExistOrNot(upiDetails)){
-            upiLogger.info("Encountered account already exist in UPI exception");
             throw new RegisteredForUPIOrNotException(String.format("Account number %d already registered for UPI",upiRegisterDTO.getAccountNo()));
         }
     }
     public static void UPIRegisterUPIPinValidation(UPIRegisterDTO upiRegisterDTO) throws InvalidUPIPinException{
         UPIPinLenValidation(upiRegisterDTO.getUpiPin());
-        upiLogger.info("Passed UPI Pin length validation");
         UPIPinCompareValidation(upiRegisterDTO.getUpiPin(),upiRegisterDTO.getConfirmUpiPin());
-        upiLogger.info("Passed UPI Pin length validation");
     }
     public static void UPIPinCompareValidation(Integer upiPin,Integer confirmPin) throws InvalidUPIPinException{
         if(!Objects.equals(upiPin, confirmPin)){
-            upiLogger.info("Encountered UPI pin and confirm pin exception");
             throw new InvalidUPIPinException(String.format("UPI Pin doesn't match with confirm UPI"));
         }
     }
     public static void UPIRegisterUPIIdValidation(UPIRegisterDTO upiRegisterDTO,UPIDetails upiDetails) throws InvalidEmailException{
         isValidUPIId(upiRegisterDTO.getUpiId());
-        upiLogger.info("Passed UPI Id exception");
         if(upiRegisterDTO.getUpiIdType() == NEWEMAIL && upiDetails != null){
-            upiLogger.info("Encountered UPI ID already exist exception");
             throw new InvalidEmailException(String.format("A different account is already registered with the UPI Id %s",upiRegisterDTO.getUpiId()));
         }
     }
     public static void accountLenValidation(Long accountNumber) throws InvalidAccountNumberException{
         String accountNumberString = String.valueOf(accountNumber);
         if (accountNumberString.length() != 11) {
-            upiLogger.info("Encountered account length exception");
             throw new InvalidAccountNumberException(String.format("Kindly enter valid 11 digit account number"));
         }
     }
     public static void UPIPinLenValidation(Integer upiPin) throws InvalidUPIPinException{
         String pinString = String.valueOf(upiPin);
         if(pinString.length() != 4){
-            upiLogger.info("Encountered UPI Pin length exception");
             throw new InvalidUPIPinException(String.format("Kindly enter valid 4 digit UPI"));
         }
     }
     public static boolean UPIaccountExistOrNot(Object UPIaccount){
         if(!Objects.equals(UPIaccount,null)){
-            upiLogger.info("UPI Account exist exception");
             return true;
         }
-        upiLogger.info("UPI Account not exist exception");
         return false;
     }
     public static void isValidUPIId(String email) throws InvalidEmailException{
