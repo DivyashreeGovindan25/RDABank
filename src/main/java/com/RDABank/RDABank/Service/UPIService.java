@@ -13,13 +13,9 @@ import com.RDABank.RDABank.Repository.PersonalDetailsRepository;
 import com.RDABank.RDABank.Repository.UPIRepository;
 import com.RDABank.RDABank.Utils.UPIUtils.UPIRegiterValidations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static com.RDABank.RDABank.Utils.RDALogger.upiLogger;
 import static com.RDABank.RDABank.Utils.UPIUtils.UPIIDType.SAMEASBANKEMAIL;
@@ -76,7 +72,7 @@ public class UPIService {
         return upiDetails.getUpiId();
     }
     public String forgotUPIPin(ForgotUPIPinDTO forgotUPIPinDTO) throws InvalidEmailException,AccountDoesnotExistException,
-            InvalidUPIPinException,InvalidAccountNumberException,IncorrectCardNumberException,InvalidExpiryDate{
+            InvalidUPIPinException,InvalidAccountNumberException,IncorrectCardNumberException, InvalidExpiryDateException {
         //Account Number validation
         UPIRegiterValidations.accountLenValidation(forgotUPIPinDTO.getAccountNo());
         upiLogger.info("Passed account length validation");

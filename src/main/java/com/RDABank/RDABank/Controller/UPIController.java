@@ -71,7 +71,7 @@ public class UPIController {
         catch(IncorrectCardNumberException incorrectCardNumberException){
             return new ResponseEntity<>(new GeneralMessageDTO(incorrectCardNumberException.getMessage()),HttpStatus.NOT_ACCEPTABLE);
         }
-        catch(InvalidExpiryDate invalidExpiryDate){
+        catch(InvalidExpiryDateException invalidExpiryDate){
             return new ResponseEntity<>(new GeneralMessageDTO(invalidExpiryDate.getMessage()),HttpStatus.NOT_ACCEPTABLE);
         }
     }
