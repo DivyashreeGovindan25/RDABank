@@ -72,7 +72,7 @@ public class UPIService {
         return upiDetails.getUpiId();
     }
     public String forgotUPIPin(ForgotUPIPinDTO forgotUPIPinDTO) throws InvalidEmailException,AccountDoesnotExistException,
-            InvalidUPIPinException,InvalidAccountNumberException,IncorrectCardNumberException, InvalidExpiryDateException {
+            InvalidUPIPinException,InvalidAccountNumberException, IncorrectCardNumException, InvalidExpiryDateException {
         //Account Number validation
         UPIRegiterValidations.accountLenValidation(forgotUPIPinDTO.getAccountNo());
         upiLogger.info("Passed account length validation");
@@ -94,8 +94,8 @@ public class UPIService {
         AccountDetails accountDetails = accountDetailsRepository.findById(forgotUPIPinDTO.getAccountNo()).orElse(null);
         Card cardsBasedAccountNo = cardDetailsRepository.findCardBasedOnAccountNo(accountDetails);
         String last6DigString = (String.valueOf(cardsBasedAccountNo.getCardNo())).substring(10,16);
-        if(String.valueOf(forgotUPIPinDTO.getLast6Digit()).length() != 6) throw new IncorrectCardNumberException(String.format("Kindly enter last 6 digits of the card number"));
-        if(!Objects.equals(last6DigString,String.valueOf(forgotUPIPinDTO.getLast6Digit()))) throw new IncorrectCardNumberException(String.format("The last 6 digit of the card number %d is not associated with your account",forgotUPIPinDTO.getLast6Digit()));
+        if(String.valueOf(forgotUPIPinDTO.getLast6Digit()).length() != 6) throw new IncorrectCardNumException(String.format("Kindly enter last 6 digits of the card number"));
+        if(!Objects.equals(last6DigString,String.valueOf(forgotUPIPinDTO.getLast6Digit()))) throw new IncorrectCardNumException(String.format("The last 6 digit of the card number %d is not associated with your account",forgotUPIPinDTO.getLast6Digit()));
         UPIRegiterValidations.expiryDateValidation(forgotUPIPinDTO.getCardExpiry());
         upiRepo.updateUPIPin(forgotUPIPinDTO.getUpiId(),forgotUPIPinDTO.getUpiPin());
         return String.format("Upi Pin reset is successfully");
