@@ -1,5 +1,6 @@
 package com.RDABank.RDABank.Controller;
 
+import com.RDABank.RDABank.DTO.ForgotUPIPinDTO;
 import com.RDABank.RDABank.DTO.GeneralMessageDTO;
 import com.RDABank.RDABank.DTO.UPIRegisterDTO;
 import com.RDABank.RDABank.Exception.*;
@@ -17,7 +18,7 @@ public class UPIController {
     @Autowired
     UPIService upiService;
     @PostMapping("/UPIRegister")
-    public ResponseEntity registerUPI(@RequestBody UPIRegisterDTO upiRegisterDTO){
+    public ResponseEntity<GeneralMessageDTO> registerUPI(@RequestBody UPIRegisterDTO upiRegisterDTO){
         upiLogger.info("In UPI Register controller");
         try{
             String response = upiService.registerUPI(upiRegisterDTO);
@@ -41,21 +42,37 @@ public class UPIController {
         }
     }
     @GetMapping("/{accountNumber}/getUPIID")
-    public ResponseEntity getUPIDetails(@PathVariable Long accountNumber){
+    public ResponseEntity<GeneralMessageDTO> getUPIDetails(@PathVariable Long accountNumber){
         upiLogger.info("In UPI Details controller");
         try{
             String upiId = upiService.getUPIDetails(accountNumber);
             upiLogger.info("Found the details");
             return new ResponseEntity<>(new GeneralMessageDTO(upiId),HttpStatus.FOUND);
         }
-        catch(RegisteredForUPIOrNotException registeredForUPIOrNotException){
+        catch(RegisteredForUPIOrNotException | AccountDoesnotExistException |
+              InvalidAccountNumberException registeredForUPIOrNotException){
             return new ResponseEntity<>(new GeneralMessageDTO(registeredForUPIOrNotException.getMessage()),HttpStatus.NOT_FOUND);
         }
-        catch(InvalidAccountNumberException invalidAccountNumberException){
-            return new ResponseEntity<>(new GeneralMessageDTO(invalidAccountNumberException.getMessage()),HttpStatus.NOT_FOUND);
+    }
+    @PutMapping("/forgotUPIPin")
+    public ResponseEntity<GeneralMessageDTO> forgotUpiPin(@RequestBody ForgotUPIPinDTO forgotUPIPinDTO){
+        upiLogger.info("In Forgot UPI Pin controller");
+        try{
+            String response = upiService.forgotUPIPin(forgotUPIPinDTO);
+            upiLogger.info("Upi Pin updated");
+            return new ResponseEntity<>(new GeneralMessageDTO(response),HttpStatus.OK);
         }
-        catch(AccountDoesnotExistException accountDoesnotExistException){
-            return new ResponseEntity<>(new GeneralMessageDTO(accountDoesnotExistException.getMessage()),HttpStatus.NOT_FOUND);
+        catch(InvalidEmailException | InvalidUPIPinException | InvalidAccountNumberException invalidEmailException){
+            return new ResponseEntity<>(new GeneralMessageDTO(invalidEmailException.getMessage()),HttpStatus.NOT_ACCEPTABLE);
+        }
+        catch(AccountDoesnotExistException accountDoesnotExistException) {
+            return new ResponseEntity<>(new GeneralMessageDTO(accountDoesnotExistException.getMessage()), HttpStatus.NOT_FOUND);
+        }
+        catch(IncorrectCardNumberException incorrectCardNumberException){
+            return new ResponseEntity<>(new GeneralMessageDTO(incorrectCardNumberException.getMessage()),HttpStatus.NOT_ACCEPTABLE);
+        }
+        catch(InvalidExpiryDate invalidExpiryDate){
+            return new ResponseEntity<>(new GeneralMessageDTO(invalidExpiryDate.getMessage()),HttpStatus.NOT_ACCEPTABLE);
         }
     }
 }

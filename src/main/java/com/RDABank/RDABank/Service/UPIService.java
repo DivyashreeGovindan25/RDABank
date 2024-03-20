@@ -1,16 +1,25 @@
 package com.RDABank.RDABank.Service;
 
+import com.RDABank.RDABank.DTO.ForgotUPIPinDTO;
 import com.RDABank.RDABank.DTO.UPIRegisterDTO;
 import com.RDABank.RDABank.Exception.*;
 import com.RDABank.RDABank.Models.AccountDetails;
+import com.RDABank.RDABank.Models.Card;
 import com.RDABank.RDABank.Models.PersonalDetails;
 import com.RDABank.RDABank.Models.UPIDetails;
 import com.RDABank.RDABank.Repository.AccountDetailsRepository;
+import com.RDABank.RDABank.Repository.CardDetailsRepository;
 import com.RDABank.RDABank.Repository.PersonalDetailsRepository;
 import com.RDABank.RDABank.Repository.UPIRepository;
 import com.RDABank.RDABank.Utils.UPIUtils.UPIRegiterValidations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.RDABank.RDABank.Utils.RDALogger.upiLogger;
 import static com.RDABank.RDABank.Utils.UPIUtils.UPIIDType.SAMEASBANKEMAIL;
@@ -23,6 +32,8 @@ public class UPIService {
     AccountDetailsRepository accountDetailsRepository;
     @Autowired
     PersonalDetailsRepository personalDetailsRepository;
+    @Autowired
+    CardDetailsRepository cardDetailsRepository;
     public String registerUPI(UPIRegisterDTO upiRegisterDTO) throws AccountDoesnotExistException, InvalidAccountNumberException,
             InvalidEmailException, InvalidUPIPinException, RegisteredForUPIOrNotException {
         //Write Logic to check if user has account in bank
@@ -63,5 +74,34 @@ public class UPIService {
         if(!upiId) throw new RegisteredForUPIOrNotException("Account not registered for UPI");
         upiLogger.info("Passed Upi account exist or not validation");
         return upiDetails.getUpiId();
+    }
+    public String forgotUPIPin(ForgotUPIPinDTO forgotUPIPinDTO) throws InvalidEmailException,AccountDoesnotExistException,
+            InvalidUPIPinException,InvalidAccountNumberException,IncorrectCardNumberException,InvalidExpiryDate{
+        //Account Number validation
+        UPIRegiterValidations.accountLenValidation(forgotUPIPinDTO.getAccountNo());
+        upiLogger.info("Passed account length validation");
+        //Provided UPI Id exist or not
+        boolean doesExist = UPIRegiterValidations.UPIaccountExistOrNot(upiRepo.getUPIWithTheProvidedUPIId(forgotUPIPinDTO.getUpiId()));
+        if(!doesExist) throw new AccountDoesnotExistException(String.format("The provided UPI Id is invalid"));
+        upiLogger.info("Passed UPI Id registered or not validation");
+        //Upi Pin Validaiton
+        UPIRegiterValidations.UPIPinLenValidation(forgotUPIPinDTO.getUpiPin());
+        UPIRegiterValidations.UPIPinCompareValidation(forgotUPIPinDTO.getUpiPin(),forgotUPIPinDTO.getConfirmUPIPin());
+        upiLogger.info("Passed UPI Pin validation");
+        //Is same UPI Id registered for this account
+        UPIDetails userUpiDetails = upiRepo.getUPIWithTheProvidedUPIId(forgotUPIPinDTO.getUpiId());
+        if(!Objects.equals(forgotUPIPinDTO.getAccountNo(),userUpiDetails.getAccountNo().getAccountNo())){
+            throw new AccountDoesnotExistException(String.format("The provided UPI ID is not registered for the given account number"));
+        }
+        upiLogger.info("Passed UPI Id registered for the given account number validation");
+        //Verifying card number
+        AccountDetails accountDetails = accountDetailsRepository.findById(forgotUPIPinDTO.getAccountNo()).orElse(null);
+        Card cardsBasedAccountNo = cardDetailsRepository.findCardBasedOnAccountNo(accountDetails);
+        String last6DigString = (String.valueOf(cardsBasedAccountNo.getCardNo())).substring(10,16);
+        if(String.valueOf(forgotUPIPinDTO.getLast6Digit()).length() != 6) throw new IncorrectCardNumberException(String.format("Kindly enter last 6 digits of the card number"));
+        if(!Objects.equals(last6DigString,String.valueOf(forgotUPIPinDTO.getLast6Digit()))) throw new IncorrectCardNumberException(String.format("The last 6 digit of the card number %d is not associated with your account",forgotUPIPinDTO.getLast6Digit()));
+        UPIRegiterValidations.expiryDateValidation(forgotUPIPinDTO.getCardExpiry());
+        upiRepo.updateUPIPin(forgotUPIPinDTO.getUpiId(),forgotUPIPinDTO.getUpiPin());
+        return String.format("Upi Pin reset is successfully");
     }
 }

@@ -7,14 +7,13 @@ import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Setter
 @Entity
 @Table(name = "CARD_DETAILS")
 public class Card {
     @Id
-    @Column(name = "CARD_NO",length = 11,nullable = false)
+    @Column(name = "CARD_NO",length = 16,nullable = false)
     private Long cardNo;
     @Column(name = "NAME_ON_THE_CARD",nullable = false)
     private String nameOnTheCard;
