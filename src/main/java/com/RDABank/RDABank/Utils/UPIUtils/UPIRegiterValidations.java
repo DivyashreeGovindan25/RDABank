@@ -6,6 +6,11 @@ import com.RDABank.RDABank.Exception.*;
 import com.RDABank.RDABank.Models.UPIDetails;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -74,21 +79,15 @@ public class UPIRegiterValidations {
         upiLogger.info("UPI Id generated with bank name as extension");
         return userName;
     }
-
-
-//    public static void forgotUPIPinBasicValidation(ForgotUPIPinDTO forgotUPIPinDTO) throws InvalidEmailException,
-//            CardNumberInvalidException,InvalidUPIPinException{
-//        String cardLen = String.valueOf(forgotUPIPinDTO.getLast6Digit());
-//        isValidUPIId(forgotUPIPinDTO.getUpiId());
-//        rdaLogger.info("Passed email validaiton");
-//        UPIPinLenValidation(forgotUPIPinDTO.getUpiPin());
-//        rdaLogger.info("Passed UPI pin validaiton");
-//        UPIPinCompareValidation(forgotUPIPinDTO.getUpiPin(),forgotUPIPinDTO.getConfirmUPIPin());
-//        rdaLogger.info("Passed UPI pin and confirm pin validaiton");
-//        if(cardLen.length() != 6){
-//            throw new CardNumberInvalidException(String.format("Kindly enter last 6 digit of your card number"));
-//        }
-//    }
+    public static void expiryDateValidation(String cardExpiry) throws InvalidExpiryDate{
+        if(!cardExpiry.matches("(?:0[1-9]|1[1-2])/[0-9]{2}")) throw new InvalidExpiryDate(String.format("The provided expiry date is invalid %s , The valid date format is MM/YY",cardExpiry));
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/yy");
+        YearMonth yearMonth = YearMonth.parse(cardExpiry, dateTimeFormatter);
+        LocalDate currentDate = LocalDate.now();
+        if(yearMonth.isBefore(YearMonth.from(currentDate))){
+            throw new InvalidExpiryDate(String.format("The card expiry date is expired, Kindly renew the card"));
+        }
+    }
 
 }
 

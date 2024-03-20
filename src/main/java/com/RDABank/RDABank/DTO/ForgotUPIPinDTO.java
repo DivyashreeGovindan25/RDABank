@@ -6,7 +6,6 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 public class ForgotUPIPinDTO {
     Long accountNo;
     String upiId;

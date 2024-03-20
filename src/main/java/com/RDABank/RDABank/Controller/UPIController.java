@@ -68,5 +68,11 @@ public class UPIController {
         catch(AccountDoesnotExistException accountDoesnotExistException) {
             return new ResponseEntity<>(new GeneralMessageDTO(accountDoesnotExistException.getMessage()), HttpStatus.NOT_FOUND);
         }
+        catch(IncorrectCardNumberException incorrectCardNumberException){
+            return new ResponseEntity<>(new GeneralMessageDTO(incorrectCardNumberException.getMessage()),HttpStatus.NOT_ACCEPTABLE);
+        }
+        catch(InvalidExpiryDate invalidExpiryDate){
+            return new ResponseEntity<>(new GeneralMessageDTO(invalidExpiryDate.getMessage()),HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 }
