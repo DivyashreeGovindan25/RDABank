@@ -17,7 +17,7 @@ import static com.RDABank.RDABank.Utils.UPIUtils.UPIIDType.NEWEMAIL;
 
 
 @Component
-public class UPIRegiterValidations {
+public class UPIValidations {
     private static final String regex = "^[a-zA-Z0-9+-_&*]+(?:\\.[a-zA-Z0-9+-_&*]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
     private static final Pattern pattern = Pattern.compile(regex);
 
@@ -33,11 +33,11 @@ public class UPIRegiterValidations {
     }
     public static void UPIRegisterUPIPinValidation(UPIRegisterDTO upiRegisterDTO) throws InvalidUPIPinException{
         UPIPinLenValidation(upiRegisterDTO.getUpiPin());
-        UPIPinCompareValidation(upiRegisterDTO.getUpiPin(),upiRegisterDTO.getConfirmUpiPin());
+        UPIPinCompareValidation(upiRegisterDTO.getUpiPin(),upiRegisterDTO.getConfirmUpiPin(),"Upi Pin and confirm pin are not matching");
     }
-    public static void UPIPinCompareValidation(Integer upiPin,Integer confirmPin) throws InvalidUPIPinException{
+    public static void UPIPinCompareValidation(Integer upiPin,Integer confirmPin,String message) throws InvalidUPIPinException{
         if(!Objects.equals(upiPin, confirmPin)){
-            throw new InvalidUPIPinException(String.format("UPI Pin doesn't match with confirm UPI"));
+            throw new InvalidUPIPinException(String.format(message));
         }
     }
     public static void UPIRegisterUPIIdValidation(UPIRegisterDTO upiRegisterDTO,UPIDetails upiDetails) throws InvalidEmailException{
@@ -65,7 +65,10 @@ public class UPIRegiterValidations {
         return false;
     }
     public static void isValidUPIId(String email) throws InvalidEmailException{
-        if(!isValidEmail(email)) throw new InvalidEmailException(String.format("Provided UPI Id is invalid %s , Kindly recheck",email));
+        if(!isValidEmail(email))
+        {
+            throw new InvalidEmailException(String.format("Provided UPI Id is invalid %s , Kindly recheck",email));
+        }
     }
     public static boolean isValidEmail(String email){
         return pattern.matcher(email).matches();
